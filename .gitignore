@@ -1,0 +1,6 @@
+*.rkt~
+*.rkt#*
+.#*.rkt
+compiled/
+racket-locale/doc/
+/coverage/
