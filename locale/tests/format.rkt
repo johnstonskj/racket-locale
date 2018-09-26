@@ -32,7 +32,7 @@
 
 (test-case
  "format-number: success cases"
- (check-equal? (set-locale "en_US") "en_US")
+ (check-equal? (set-numeric-locale "en_US") "en_US")
  (check-equal? (format-number 1) "1")
  (check-equal? (format-number 0.1) "0.1")
  (check-equal? (format-number 1024.42) "1024.42")

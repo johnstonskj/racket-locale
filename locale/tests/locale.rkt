@@ -19,7 +19,7 @@
 
 (test-case
  "get-locale-conventions: check conventions for known locale"
- (check-equal? (set-locale "en_GB") "en_GB")
+ (check-equal? (set-numeric-locale "en_GB") "en_GB")
  (define conventions (get-locale-conventions))
  (check-equal? (locale-decimal-point conventions) ".")
  (check-equal? (locale-thousands-separator conventions) ","))

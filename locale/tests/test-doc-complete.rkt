@@ -33,5 +33,4 @@
          (displayln out))
        (check-eq? (string-length out) 0)))))
 
-(module+ main
-  (test-doc-coverage 'racket-locale))
+(test-doc-coverage '(locale locale/format locale/language-info))
