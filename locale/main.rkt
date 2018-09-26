@@ -91,7 +91,7 @@
 ;; country/region is an upper case ISO-3166-1 identifier
 ;; code-page
 (define locale-name-string
-  (pregexp "^([a-z]{2,3})(_[A-Z]{2,3})?(\\.[a-zA-Z0-9\\-]+)?$"))
+  (pregexp "^([a-z]{2,3})(_[A-Z]{2,3})?(\\.[a-zA-Z0-9\\-]+)?(@[a-zA-Z0-9\\-]+)?$"))
 
 ;; ---------- Implementation
 
