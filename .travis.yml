@@ -40,10 +40,9 @@ install:
  - raco pkg install --deps search-auto
 
 before_script:
+ - locale
+ - env |grep LC_
 
-# Here supply steps such as raco make, raco test, etc.  You can run
-# `raco pkg install --deps search-auto` to install any required
-# packages without it getting stuck on a confirmation prompt.
 script:
  - raco test -t -c locale
 
