@@ -174,7 +174,7 @@
   (setlocale LC_MESSAGES #f))
 
 (define (get-locale-conventions)
-  (define (bytes-to-vector byte-string)
+  (define (bytes->vector byte-string)
     (define vec (for/vector ([b byte-string]) b))
     (cond
       [(= (vector-length vec) 0)
@@ -188,13 +188,13 @@
       #f
       (locale
        (lconv-decimal-point actual-lconv)
-       (lconv-thousands-separator actual-lconv)
-       (bytes-to-vector (lconv-grouping actual-lconv))
+       (bytes->string/fallback (lconv-thousands-separator actual-lconv))
+       (bytes->vector (lconv-grouping actual-lconv))
        (lconv-international-currency-symbol actual-lconv)
-       (lconv-currency-symbol actual-lconv)
+       (bytes->string/fallback (lconv-currency-symbol actual-lconv))
        (lconv-monetary-decimal-point actual-lconv)
-       (lconv-monetary-thousands-separator actual-lconv)
-       (bytes-to-vector (lconv-monetary-grouping actual-lconv))
+       (bytes->string/fallback (lconv-monetary-thousands-separator actual-lconv))
+       (bytes->vector (lconv-monetary-grouping actual-lconv))
        (lconv-positive-sign actual-lconv)
        (lconv-negative-sign actual-lconv)
        (lconv-international-fractional-digits actual-lconv)
@@ -226,22 +226,26 @@
           (log-debug "ignoring builtin locale identifier")]
          [else 
           (define matches (regexp-match locale-name-string line))
-          (unless matches (error "unknown locale string format: ~a" line))
+          (cond 
+	   [(or (false? matches) (empty? matches)) 
+	    (log-error "unknown locale string format: ~a" line)]
+	   [else
+	    (define language (second matches))
+            (when (not (hash-has-key? locales language))
+              (hash-set! locales language (make-hash)))
 
-          (define language (second matches))
-          (when (not (hash-has-key? locales language))
-            (hash-set! locales language (make-hash)))
+            (when (third matches)
+              (define country (substring (third matches) 1))
+              (when (not (hash-has-key? (hash-ref locales language) country))
+                (hash-set! (hash-ref locales language) country '()))
 
-          (when (third matches)
-            (define country (substring (third matches) 1))
-            (when (not (hash-has-key? (hash-ref locales language) country))
-              (hash-set! (hash-ref locales language) country '()))
-
-            (when (fourth matches)
-              (define current-list (hash-ref (hash-ref locales language) country))
-              (hash-set! (hash-ref locales language)
-                         country
-                         (cons (fourth matches) current-list))))]))]
+              (when (fourth matches)
+                (define current-list (hash-ref (hash-ref locales language) country))
+                (hash-set! (hash-ref locales language)
+                           country
+			   (if (fifth matches)
+			       (cons (string-append (fourth matches) (fifth matches)) current-list)
+                               (cons (fourth matches) current-list)))))])]))]
     ['windows
      (log-warning "windows not yet implemented")]
     [else (error "unknown system-type ~a" (system-type))])

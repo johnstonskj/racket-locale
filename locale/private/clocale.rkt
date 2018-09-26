@@ -17,9 +17,11 @@
 (require racket/bool
          racket/match
          racket/port
+         racket/string
          racket/system
          ffi/unsafe
-         ffi/unsafe/define)
+         ffi/unsafe/define
+         "./system-type.rkt")
 
 ;; ---------- Internal types
 
@@ -29,17 +31,12 @@
 
 ;; ---------- Implementation
 
-;; ***** The following are from <locale.h>
+(define (bytes->string/fallback bstr)
+  (with-handlers ([exn:fail?
+                   (lambda (e) (bytes->string/latin-1 bstr))])
+    (bytes->string/utf-8 bstr)))
 
-(define system-type-ext
-  (let ([type (system-type)])
-    (match type
-      ['windows type]
-      ['macosx type]
-      ['unix
-       (string->symbol (with-output-to-string (lambda () (system "uname -s"))))]
-      [else (error "unknown system type " type)])))
-      
+;; ***** The following are from <locale.h>
 
 (define LC_ALL             (match system-type-ext ['macosx 0] ['Linux 6]))
 (define LC_COLLATE         (match system-type-ext ['macosx 1] ['Linux 3]))
@@ -68,12 +65,12 @@
 ;; descriptions from http://www.cplusplus.com/reference/clocale/lconv/
 
 (define-cstruct _lconv ([decimal-point _string]
-                        [thousands-separator _string]
+                        [thousands-separator _bytes]
                         [grouping _bytes]
                         [international-currency-symbol _string]
-                        [currency-symbol _string]
+                        [currency-symbol _bytes]
                         [monetary-decimal-point _string]
-                        [monetary-thousands-separator _string]
+                        [monetary-thousands-separator _bytes]
                         [monetary-grouping _bytes]
                         [positive-sign _string]
                         [negative-sign _string]
@@ -163,8 +160,7 @@
 
 (define CRNCYSTR        (match system-type-ext ['macosx 56] ['Linux 262159]))
 
-(define-libc nl_langinfo (_fun _int -> _string))
-
+(define-libc nl_langinfo (_fun _int -> _bytes))
 
 ;; ***** The following is from <localcharset.h>
 ;;
