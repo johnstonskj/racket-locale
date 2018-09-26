@@ -265,7 +265,8 @@
        (cond
          [(equal? line "")
           (log-debug "ignoring blank lines")]
-         [(or (equal? line "C") (equal? line "POSIX"))
+         [(or (equal? line "C") (string-prefix? line "C.")
+              (equal? line "POSIX") (string-prefix? line "POSIX."))
           (log-debug "ignoring builtin locale identifier")]
          [else 
           (define matches (regexp-match locale-name-string line))
