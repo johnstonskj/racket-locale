@@ -1,6 +1,6 @@
 #lang racket/base
 ;;
-;; racket-locale - format.
+;; racket-locale - language-info.
 ;;   More locale tools for Racket
 ;;   
 ;;

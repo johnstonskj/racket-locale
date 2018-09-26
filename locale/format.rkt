@@ -291,8 +291,10 @@
     ["%p"
      (define hour (date-hour dt))
      (if (> hour 12) (get-pm-string) (get-am-string))]
-    ["%r" (error "unsupported: 12-hour clock time")]
-    ["%R" (error "unsupported: 24-hour HH:MM time") ]
+    ["%r" (format "~a:~a"
+                  (if (> (date-hour dt) 12) (- (date-hour dt) 12) (date-hour dt))
+                  (date-minute dt))]
+    ["%R" (format "~a:~a" (date-hour dt) (date-minute dt))]
     ["%S" (date-second dt)]
     ["%t" "\t"]
     ["%T"
