@@ -116,8 +116,8 @@
                        (locale-grouping (get-locale-conventions))))
   (define group (vector-ref grouping 0))
   (cond
-    [(and (> group 0)    ; group repeat of nothing?
-          (< group 127)  ; end of group repeat
+    [(and (> group grouping-repeats)
+          (< group grouping-ends)
           (> (string-length str) group))
      (define sep (thousands-separator currency))
      (define sep-lst (if (equal? sep "") '() (string->list sep)))
@@ -149,7 +149,6 @@
   (findf non-empty-string? lst))
 
 (define (format-currency-and-sign quantity symbol symbol-precedes symbol-space sign sign-position)
-  (displayln (format "format-currency-and-sign ~s ~s ~s ~s ~s ~s" quantity symbol symbol-precedes symbol-space sign sign-position))
   (cond
     [(= symbol-precedes 0)
      (cond

@@ -54,8 +54,6 @@
 
 (define VALUE_UNAVAILABLE  127)
 
-(define END_GROUP_REPEAT   127)
-
 (define MINIMAL_LOCALE     "C")
 (define USER_LOCALE        "")
 

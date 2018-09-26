@@ -80,5 +80,4 @@
 	   (displayln (format "info: could not set locale to ~a, ignoring" (car test-locale-currency)))
 	   (test-case
 	    (format "format-currency: for local ~a" (car test-locale-currency))
-	    (displayln (format "format-currency: for local ~a" (car test-locale-currency)))
 	    (check-equal? (format-currency 1234.567) (cdr test-locale-currency))))))

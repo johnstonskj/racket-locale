@@ -6,6 +6,7 @@
           locale
           (for-label racket/base
                      racket/contract
+                     racket/math
                      locale))
 
 @;{============================================================================}
@@ -23,19 +24,31 @@ More locale tools for Racket
 
 @examples[ #:eval example-eval
 (require locale)
-; add more here.
+(set-locale "en_GB")
+(get-locale-conventions)
+(set-locale (make-locale-string "ja" "JP"))
+(get-locale-conventions)
+(set-locale "C")
+(get-locale-conventions)
+(get-known-locales)
 ]
 
 @;{============================================================================}
-
-@;Add your API documentation here...
-
 
 Document  - TBD
 
 @defproc[(locale-string?
           [str string?])
          boolean?]{
+TBD
+}
+
+@defproc[(make-locale-string
+          [language string?]
+          [country string? ""]
+          [#:code-page code-page string? ""]
+          [#:options options string? ""])
+         (or/c string? #f)]{
 TBD
 }
 
@@ -131,7 +144,15 @@ TBD
 TBD
 }
 
-@defthing[CHAR_MAX number?]{
+@defthing[grouping-repeats nonnegative-integer?]{
+TBD
+}
+
+@defthing[grouping-ends positive-integer?]{
+TBD
+}
+
+@defthing[unspecified-sign-posn positive-integer?]{
 TBD
 }
 
@@ -167,17 +188,21 @@ TBD
  @item{@racket[thousands-separator] - Separators used to delimit groups of digits to the left of
    the decimal point for non-monetary quantities.}
  @item{@racket[grouping] - Specifies the amount of digits that form each of the groups to be
-   separated by thousands_sep separator for non-monetary quantities. This is a zero-terminated
-   sequence of char values that may contain different grouping sizes for each successive group
-   starting from the right, each number indicating the amount of digits for the group; the last
-   number before the ending zero in this string is used for the remaining groups. For example,
-   assuming thousand_sep is set to @tt{","} and the number to represent is one million
+   separated by @racket[thousands-separator] separator for non-monetary quantities. This is a
+   @racket[vector?] of @racket[nonnegative-integer?] values that may contain different grouping
+   sizes for each successive group starting from the right, each number indicating the amount
+   of digits for the group. If the last number in the vector is @racket[grouping-repeats] the
+   previous value will be used for all remaining groups. For example, assuming
+   @racket[thousands-separator] is set to @tt{","} and the number to represent is one million
    (@tt{1000000}):
    @itemlist[
-    @item{with grouping set to @racket['#(3 0)], the number would be represented as: @tt{1,000,000}}
-    @item{with grouping set to @racket['#(1 2 3 0)], the number would be represented as: @tt{1,000,00,0}}
-    @item{with grouping set to @racket['#(3 1 0)], the number would be represented as: @tt{1,0,0,0,000}}
-    @item{CHAR_MAX indicates that no further grouping is to be performed.}
+    @item{with grouping set to @racket['#(3 grouping-repeats)], the number would be
+     represented as: @tt{1,000,000}}
+    @item{with grouping set to @racket['#(1 2 3 grouping-repeats)], the number would be
+     represented as: @tt{1,000,00,0}}
+    @item{with grouping set to @racket['#(3 1 grouping-repeats)], the number would be
+     represented as: @tt{1,0,0,0,000}}
+    @item{@racket[grouping-ends] indicates that no further grouping is to be performed.}
    ]
   }
  @item{@racket[international-currency-symbol] - International currency symbol. This is formed
@@ -189,7 +214,7 @@ TBD
  @item{@racket[monetary-thousands-separator] - 	Separators used to delimit groups of digits
    to the left of the decimal point for monetary quantities.}
  @item{@racket[monetary-grouping] - Specifies the amount of digits that form each of the
-   groups to be separated by mon_thousands_sep separator for monetary quantities.
+   groups to be separated by @racket[monetary-thousands-separator] separator for monetary quantities.
    See grouping description above.}
  @item{@racket[positive-sign] - Sign to be used for nonnegative (positive or zero) monetary
    quantities.}
@@ -216,7 +241,7 @@ TBD
    @item{2 : Sign after the quantity and currency symbol.}
    @item{3 : Sign right before currency symbol.}
    @item{4 : Sign right after currency symbol.}
-   @item{CHAR_MAX : Unspecified.}
+   @item{@racket[unspecified-sign-posn] : unspecified.}
   ]
   }
  @item{@racket[neg-sign-posn] - Position of the sign for negative monetary quantities. See

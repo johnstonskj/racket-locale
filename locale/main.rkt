@@ -15,6 +15,9 @@
   [locale-string?
    (-> string? boolean?)]
 
+  [make-locale-string
+   (->* (string?) (string? #:code-page string? #:options string?) (or/c string? #f))]
+
   [get-known-locales
    (-> (hash/c string? (hash/c string? (listof string?))))]
   
@@ -67,7 +70,13 @@
    (-> string? (or/c string? #f))]
 
   [get-locale-conventions
-   (-> locale?)])
+   (-> locale?)]
+
+  [grouping-repeats nonnegative-integer?]
+
+  [grouping-ends positive-integer?]
+
+  [unspecified-sign-posn positive-integer?])
  
  (except-out (struct-out locale)
              locale))
@@ -77,6 +86,7 @@
 (require racket/bool
          racket/list
          racket/match
+         racket/math
          racket/port
          racket/string
          racket/system
@@ -85,15 +95,22 @@
 
 ;; ---------- Internal
 
-;; locale-string := language ["_" country/region ["." code-page]]
+;; locale-string := language ["_" country/region ["." code-page ["@" options?]]
 ;;                  | "C" | ""
 ;; lanaguage is a lower case ISO-639-1 or ISO_639-2/T identifier
 ;; country/region is an upper case ISO-3166-1 identifier
 ;; code-page
+;; options
 (define locale-name-string
   (pregexp "^([a-z]{2,3})(_[A-Z]{2,3})?(\\.[a-zA-Z0-9\\-]+)?(@[a-zA-Z0-9\\-]+)?$"))
 
 ;; ---------- Implementation
+
+(define grouping-repeats 0)
+
+(define grouping-ends VALUE_UNAVAILABLE)
+
+(define unspecified-sign-posn VALUE_UNAVAILABLE)
 
 (struct locale (decimal-point
                 thousands-separator
@@ -120,6 +137,32 @@
                 international-pos-sign-posn
                 international-neg-sign-posn)
   #:transparent)
+
+(define (make-locale-string language [country ""] #:code-page [code-page ""] #:options [options ""])
+  (cond
+    [(false? (regexp-match #px"^[a-z]{2,3}$" language))
+     (log-warning "language string ~s is invalid" language)
+     #f]
+    [(and (non-empty-string? country) (false? (regexp-match #px"^[A-Z]{2,3}$" country)))
+     (log-warning "country string ~s is invalid" country)
+     #f]
+    [(and (non-empty-string? code-page) (false? (regexp-match #px"^[a-zA-Z0-9\\-]+$" code-page)))
+     (log-warning "code-page string ~s is invalid" code-page)
+     #f]
+    [(and (non-empty-string? options) (false? (regexp-match #px"^[a-zA-Z0-9\\-]+$" options)))
+     (log-warning "options string ~s is invalid" options)
+     #f]
+    [else (format "~a~a~a~a"
+                  language
+                  (if (non-empty-string? country)
+                      (string-append "_" country)
+                      country)
+                  (if (non-empty-string? code-page)
+                      (string-append "." code-page)
+                      code-page)
+                  (if (non-empty-string? options)
+                      (string-append "@" options)
+                      options))]))
 
 (define (locale-string? str)
   (define matches (regexp-match locale-name-string str))
@@ -178,11 +221,11 @@
     (define vec (for/vector ([b byte-string]) b))
     (cond
       [(= (vector-length vec) 0)
-       (vector 0)]
-      [(= (vector-ref vec (sub1 (vector-length vec))) END_GROUP_REPEAT)
+       (vector grouping-repeats)]
+      [(= (vector-ref vec (sub1 (vector-length vec))) grouping-ends)
        vec]
       [else
-       (vector-append vec (vector 0))]))
+       (vector-append vec (vector grouping-repeats))]))
   (define actual-lconv (localeconv))
   (if (false? actual-lconv)
       #f
@@ -226,25 +269,27 @@
           (log-debug "ignoring builtin locale identifier")]
          [else 
           (define matches (regexp-match locale-name-string line))
-          (cond 
-	   [(or (false? matches) (empty? matches)) 
-	    (log-error "unknown locale string format: ~a" line)]
-	   [else
-	    (define language (second matches))
+          (unless matches (error "unknown locale string format: ~a" line))
+
+         (cond
+           [(or (false? matches) (empty? matches))
+            (log-error "unknown locale string format: ~a" line)]
+           [else
+            (define language (second matches))
             (when (not (hash-has-key? locales language))
               (hash-set! locales language (make-hash)))
-
+            
             (when (third matches)
               (define country (substring (third matches) 1))
               (when (not (hash-has-key? (hash-ref locales language) country))
                 (hash-set! (hash-ref locales language) country '()))
-
+              
               (when (fourth matches)
                 (define current-list (hash-ref (hash-ref locales language) country))
                 (hash-set! (hash-ref locales language)
                            country
-			   (if (fifth matches)
-			       (cons (string-append (fourth matches) (fifth matches)) current-list)
+                           (if (fifth matches)
+                               (cons (string-append (fourth matches) (fifth matches)) current-list)
                                (cons (fourth matches) current-list)))))])]))]
     ['windows
      (log-warning "windows not yet implemented")]

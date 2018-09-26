@@ -10,10 +10,25 @@
 
 (require racket/bool
          racket/date
+         racket/list
          rackunit
          ; ---------
          locale
          locale/format)
+
+; we do this to debug builds, is it failing because of defects in test
+; cases or because certain, assumed, locales are not present on the
+; test system.
+(begin
+  (define known-locales (get-known-locales))
+  (displayln "Known locales:")
+  (displayln
+   (sort
+    (flatten
+     (for/list ([language (hash-keys known-locales)])
+       (for/list ([country (hash-keys (hash-ref known-locales language))])
+         (format "~a_~a" language country))))
+    string<?)))
 
 ;; ---------- Test Fixtures
 
@@ -24,6 +39,7 @@
 
 (test-case
  "format-number: success cases"
+  (check-equal? (set-locale "en_GB") "en_GB")
   (check-equal? (format-number 1) "1")
   (check-equal? (format-number 0.1) "0.1")
   (check-equal? (format-number 1024.42) "1024.42")

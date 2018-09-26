@@ -6,12 +6,14 @@
           locale/format
           (for-label racket/base
                      racket/contract
+                     locale
                      locale/format))
 
 @;{============================================================================}
 
 @(define example-eval (make-base-eval
                       '(require racket/string
+                                locale
                                 locale/format)))
 
 @;{============================================================================}
@@ -21,8 +23,14 @@
 
 
 @examples[ #:eval example-eval
-(require locale/format)
-; add more here.
+(require locale
+         locale/format
+         racket/date)
+(set-locale "en_GB")
+
+(format-date (current-date))
+(format-number 1234567.89)
+(format-currency 10.99)
 ]
 
 @;{============================================================================}

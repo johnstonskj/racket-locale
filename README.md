@@ -3,8 +3,8 @@
 [![GitHub release](https://img.shields.io/github/release/johnstonskj/racket-locale.svg?style=flat-square)](https://github.com/johnstonskj/racket-locale/releases)
 [![Travis Status](https://travis-ci.org/johnstonskj/racket-locale.svg)](https://www.travis-ci.org/johnstonskj/racket-locale)
 [![Coverage Status](https://coveralls.io/repos/github/johnstonskj/racket-locale/badge.svg?branch=master)](https://coveralls.io/github/johnstonskj/racket-locale?branch=master)
-[![raco pkg install racket-locale](https://img.shields.io/badge/raco%20pkg%20install-rml--core-blue.svg)](http://pkgs.racket-lang.org/package/racket-locale)
-[![Documentation](https://img.shields.io/badge/raco%20docs-rml--core-blue.svg)](http://docs.racket-lang.org/racket-locale/index.html)
+[![raco pkg install racket-locale](https://img.shields.io/badge/raco%20pkg%20install-racket--locale-blue.svg)](http://pkgs.racket-lang.org/package/racket-locale)
+[![Documentation](https://img.shields.io/badge/raco%20docs-racket--locale-blue.svg)](http://docs.racket-lang.org/racket-locale/index.html)
 [![GitHub stars](https://img.shields.io/github/stars/johnstonskj/racket-locale.svg)](https://github.com/johnstonskj/racket-locale/stargazers)
 ![MIT License](https://img.shields.io/badge/license-MIT-118811.svg)
 
@@ -12,17 +12,19 @@
 
 ## Modules
 
-* `locale` - TBD.
-* `locale/language-info` - TBD
-* `locale/format` - TBD
-* `locale/names` - TBD
+* `locale` - basic locale functions, get/set the current locale as well as locale conventions.
+* `locale/language-info` - additional locale information.
+* `locale/format` - locale -aware formatting for numbers, currency, and dates,
 
 ## Example
 
 ```scheme
-(require locale)
+(require locale locale/format racket/date)
+(set-locale "en_GB")
 
-;; add example here
+(format-date (current-date))
+(format-number 1234567.89)
+(format-currency 10.99)
 ```
 
 
