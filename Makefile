@@ -1,6 +1,5 @@
 PACKAGENAME=racket-locale
 COLLECTS=locale
-TESTS=locale/tests
 SCRBL=locale/scribblings/$(PACKAGENAME).scrbl
 
 all: setup test
@@ -20,7 +19,7 @@ unlink:
 	raco pkg remove $(PACKAGENAME)
 
 test:
-	raco test $(TESTS)
+	raco test -t -c $(COLLECTS)
 
 coverage:
 	raco cover -b -f coveralls -p $(PACKAGENAME)

@@ -267,12 +267,12 @@
           (log-debug "ignoring blank lines")]
          [(or (equal? line "C") (string-prefix? line "C.")
               (equal? line "POSIX") (string-prefix? line "POSIX."))
-          (log-debug "ignoring builtin locale identifier")]
+          (log-debug "ignoring builtin locale identifier: ~s" line)]
          [else 
           (define matches (regexp-match locale-name-string line))
           (cond
             [(or (false? matches) (empty? matches))
-             (log-error "unknown locale string format: " line)]
+             (log-error "unknown locale string format: ~s" line)]
             [else
              (define language (second matches))
              (when (not (hash-has-key? locales language))

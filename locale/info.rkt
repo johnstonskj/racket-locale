@@ -8,4 +8,4 @@
 (define collection "locale")
 (define scribblings '(("scribblings/racket-locale.scrbl" (multi-page))))
 
-(define test-omit-paths '("scribblings"))
+(define test-omit-paths '("scribblings" "private"))
