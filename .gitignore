@@ -2,5 +2,5 @@
 *.rkt#*
 .#*.rkt
 compiled/
-racket-locale/doc/
+/locale/doc/
 /coverage/

@@ -96,7 +96,8 @@
      (define sign-position (if international
                                (locale-international-neg-sign-posn locale-conv)
                                (locale-neg-sign-posn locale-conv)))
-     (format-currency-and-sign basic symbol symbol-precedes symbol-space sign sign-position)]))
+     (format-currency-and-sign basic symbol symbol-precedes symbol-space sign sign-position)]
+  [else (error "what kind of number is this? ~a" num)]))
 
 (define (format-date dt)
   (format-date-with (->date dt) (get-date-format)))
@@ -148,6 +149,7 @@
   (findf non-empty-string? lst))
 
 (define (format-currency-and-sign quantity symbol symbol-precedes symbol-space sign sign-position)
+  (displayln (format "format-currency-and-sign ~s ~s ~s ~s ~s ~s" quantity symbol symbol-precedes symbol-space sign sign-position))
   (cond
     [(= symbol-precedes 0)
      (cond
@@ -311,7 +313,9 @@
     ["%z"
      (define minute-offset (quotient (date-time-zone-offset dt)))
      (~r (+ (* (quotient minute-offset 60) 100) (remainder minute-offset 60)))]
-    ["%Z" (error "unsupported: time zone name (no characters if no time zone exists)")]
+    ["%Z" 
+     ;; TODO: time zone name (no characters if no time zone exists)
+     ""]
     ["%%" "%"]
     [else (error "unknown date format variable in " format-str)]))
 
