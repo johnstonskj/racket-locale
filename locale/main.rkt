@@ -270,31 +270,29 @@
           (log-debug "ignoring builtin locale identifier")]
          [else 
           (define matches (regexp-match locale-name-string line))
-          (unless matches (error "unknown locale string format: ~a" line))
-
-         (cond
-           [(or (false? matches) (empty? matches))
-            (log-error "unknown locale string format: ~a" line)]
-           [else
-            (define language (second matches))
-            (when (not (hash-has-key? locales language))
-              (hash-set! locales language (make-hash)))
-            
-            (when (third matches)
-              (define country (substring (third matches) 1))
-              (when (not (hash-has-key? (hash-ref locales language) country))
-                (hash-set! (hash-ref locales language) country '()))
-              
-              (when (fourth matches)
-                (define current-list (hash-ref (hash-ref locales language) country))
-                (hash-set! (hash-ref locales language)
-                           country
-                           (if (fifth matches)
-                               (cons (string-append (fourth matches) (fifth matches)) current-list)
-                               (cons (fourth matches) current-list)))))])]))]
+          (cond
+            [(or (false? matches) (empty? matches))
+             (log-error "unknown locale string format: " line)]
+            [else
+             (define language (second matches))
+             (when (not (hash-has-key? locales language))
+               (hash-set! locales language (make-hash)))
+             
+             (when (third matches)
+               (define country (substring (third matches) 1))
+               (when (not (hash-has-key? (hash-ref locales language) country))
+                 (hash-set! (hash-ref locales language) country '()))
+               
+               (when (fourth matches)
+                 (define current-list (hash-ref (hash-ref locales language) country))
+                 (hash-set! (hash-ref locales language)
+                            country
+                            (if (fifth matches)
+                                (cons (string-append (fourth matches) (fifth matches)) current-list)
+                                (cons (fourth matches) current-list)))))])]))]
     ['windows
      (log-warning "windows not yet implemented")]
-    [else (error "unknown system-type ~a" (system-type))])
+    [else (error "unknown system-type " (system-type))])
   locales)
 
 ;; ---------- Internal tests
