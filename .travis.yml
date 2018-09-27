@@ -42,6 +42,7 @@ install:
 before_script:
  - locale
  - env |grep LC_
+ - (echo "import locale" ; echo "print locale.setlocale(locale.LC_TIME, \"en_GB\")") | python
 
 script:
  - raco test -t -c locale
