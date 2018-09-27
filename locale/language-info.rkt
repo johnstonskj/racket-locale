@@ -11,11 +11,12 @@
 (require racket/contract)
 
 (provide
+ 
  (all-defined-out))
 
 ;; ---------- Requirements
 
-(require "private/clocale.rkt")
+(require locale/private/clocale)
 
 ;; ---------- Implementation
 

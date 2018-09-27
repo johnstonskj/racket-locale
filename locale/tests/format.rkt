@@ -12,7 +12,8 @@
          rackunit
          ; ---------
          locale
-         locale/format)
+         locale/format
+         locale/tests/utils)
 
 ; we do this to debug builds, is it failing because of defects in test
 ; cases or because certain, assumed, locales are not present on the
@@ -32,7 +33,8 @@
 
 (test-case
  "format-number: success cases"
- (check-equal? (set-numeric-locale "en_US") "en_US")
+ (define us-locale (make-locale-string "en" "US" #:code-page (get-code-page 'utf-8)))
+ (check-equal? (set-numeric-locale us-locale) us-locale)
  (check-equal? (format-number 1) "1")
  (check-equal? (format-number 0.1) "0.1")
  (check-equal? (format-number 1024.42) "1024.42")

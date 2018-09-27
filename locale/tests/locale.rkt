@@ -1,6 +1,6 @@
 #lang racket/base
 ;;
-;; racket-locale - locale.
+;; racket-locale - tests/locale.
 ;;   More locale tools for Racket
 ;;
 ;; Copyright (c) 2018 Simon Johnston (johnstonskj@gmail.com).
@@ -9,7 +9,8 @@
 
 (require rackunit
          ; ---------
-         locale)
+         locale
+         locale/tests/utils)
 
 ;; ---------- Test Fixtures
 
@@ -19,7 +20,8 @@
 
 (test-case
  "get-locale-conventions: check conventions for known locale"
- (check-equal? (set-numeric-locale "en_GB") "en_GB")
+ (define locale (make-locale-string "en" "GB" #:code-page (get-code-page 'utf-8)))
+ (check-equal? (set-numeric-locale locale) locale)
  (define conventions (get-locale-conventions))
  (check-equal? (locale-decimal-point conventions) ".")
  (check-equal? (locale-thousands-separator conventions) ","))

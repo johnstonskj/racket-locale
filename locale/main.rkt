@@ -91,7 +91,7 @@
          racket/string
          racket/system
          racket/vector
-         "private/clocale.rkt")
+         locale/private/clocale)
 
 ;; ---------- Internal
 

@@ -37,7 +37,7 @@
          racket/string
          locale
          locale/language-info
-         "private/matches.rkt")
+         locale/private/matches)
 
 ;; ---------- Internal types
 
