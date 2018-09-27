@@ -302,7 +302,9 @@
              (date-hour dt)
              (date-minute dt)
              (date-second dt))]
-    ["%u" (error "unsupported: ISO 8601 weekday as number with Monday as 1")]
+    ["%u"
+     ; ISO-8601 week-day
+     (~a (if (= (date-week-day dt) 0) 7 (date-week-day dt)))]
     ["%U" (error "unsupported: week number of the year -- Sunday starts")]
     ["%v" (error "unsupported: ISO 8601 week number")]
     ["%w" (~a (add1 (date-week-day dt)))]

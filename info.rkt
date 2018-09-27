@@ -14,7 +14,8 @@
 (define deps '(
   "base"
   "rackunit-lib"
-  "racket-index"))
+  "racket-index"
+  "gregor-lib"))
 (define build-deps '(
   "scribble-lib"
   "racket-doc"
