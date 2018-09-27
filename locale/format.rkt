@@ -17,7 +17,7 @@
    (-> number? string?)]
 
   [format-currency
-   (-> number? string?)]
+   (->* (number?) (boolean?) string?)]
  
   [format-date
    (-> (or/c date? number?) string?)]

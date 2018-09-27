@@ -20,7 +20,14 @@
 @title{Module locale}
 @defmodule[locale]
 
-More locale tools for Racket
+This module has functions for managing locale strings, for getting and setting
+locales and retrieving locale-specific conventions. It is important to understand
+that there isn't a single locale value that encompasses all purposes, there are
+a set of @italic{categories} such as date/time handling, number and currency
+formatting, and string/character encoding, each of which may have a separate
+locale identified. In this module there are functions of the form
+@tt{get-}@italic{category}@tt{-locale} and @tt{set-}@italic{category}@tt{-locale}
+for each supported category.
 
 @examples[ #:eval example-eval
 (require locale)
@@ -44,18 +51,20 @@ Returns @racket[#t] if the provided string @racket[str] is a correctly formatted
 locale name according to the following rules:
 
 @verbatim|{
-locale    := "C"
-           | "POSIX"
+locale    := "C" | "POSIX" |@italic{; well-known portable locales}
            | (language) ("_" territory)? ("." code-page)? ("@" modifier)
 
-language  := [a-z]{2,3}
+language  := [a-z]{2,3}    |@italic{; ISO 639 language code}
 
-territory := [A-Z]{2,3}
+territory := [A-Z]{2,3}    |@italic{; ISO 3166 country code}
 
 code-page := [a-zA-Z0-9\-]+
 
 modifier  := [a-zA-Z0-9\-]+
 }|
+
+The locale strings @tt{"C"} and @tt{"POSIX"} are defined for all systems and
+have well-known behavior.
 }
 
 @defproc[(make-locale-string
@@ -72,7 +81,9 @@ value will result in @racket[#f] rather than a locale string.
 @defproc[(normalize-code-page
           [code-page (or/c 'utf-8 'ascii 'iso-8859-1 'iso-8859-15)])
          string?]{
-TBD
+Code page strings are also very system dependent, this helper takes in a symbol
+representing common page types and should return the system-dependent string
+version for use in @racket[make-locale-string].
 }
 
 @defproc[(get-known-locales)
@@ -95,17 +106,31 @@ the @racket[territory] as the key and a list of @racket[code-page] and
   
 @defproc[(set-minimal-locale)
          (or/c locale-string? #f)]{
-TBD
+The locale @tt{"C"} or @tt{"POSIX"} is a portable locale; it exists on all
+conforming systems.
 }
 
 @defproc[(set-user-preferred-locale)
          (or/c locale-string? #f)]{
-TBD
+A system dependent way of setting a default locale, each part of the locale that
+@italic{should} be modified is set according to the process environment.
 }
 
 @defproc[(get-locale)
          (or/c locale-string? #f)]{
-TBD
+This function will either 1) return a single string that is the common locale for
+all categories, or 2) return a @tt{";"} separated string list of category and locale
+pairs.
+
+@examples[ #:eval example-eval
+(require locale)
+(set-minimal-locale)
+(set-numeric-locale
+ (make-locale-string "en" ; language
+                     "US" ; country/territory
+                     #:code-page (normalize-code-page 'utf-8)))
+(get-locale)
+]
 }
 
 @defproc[(set-locale
@@ -116,7 +141,8 @@ TBD
 
 @defproc[(get-collation-locale)
          (or/c locale-string? #f)]{
-TBD
+Affects the behavior of strcoll and strxfrm.
+
 }
 
 @defproc[(set-collation-locale
@@ -127,7 +153,9 @@ TBD
 
 @defproc[(get-character-type-locale)
          (or/c locale-string? #f)]{
-TBD
+Affects character handling functions (all functions of <cctype>, except isdigit and
+isxdigit), and the multibyte and wide character functions.
+
 }
 
 @defproc[(set-character-type-locale
@@ -138,18 +166,21 @@ TBD
 
 @defproc[(get-monetary-locale)
          (or/c locale-string? #f)]{
-TBD
+Affects monetary formatting information returned by @racket[get-locale-conventions].
+
 }
 
 @defproc[(set-monetary-locale
           [locale locale-string?])
          (or/c locale-string? #f)]{
-TBD
+
 }
 
 @defproc[(get-numeric-locale)
          (or/c locale-string? #f)]{
-TBD
+Affects the decimal-point character in formatted input/output operations and string
+formatting functions, as well as non-monetary information returned by
+@racket[get-locale-conventions].
 }
 
 @defproc[(set-numeric-locale
@@ -160,7 +191,8 @@ TBD
 
 @defproc[(get-time-locale)
          (or/c locale-string? #f)]{
-TBD
+Affects the behavior of strftime.
+locale
 }
 
 @defproc[(set-time-locale
@@ -171,7 +203,7 @@ TBD
 
 @defproc[(get-messages-locale)
          (or/c locale-string? #f)]{
-TBD
+Localizable natural-language messages.
 }
 
 @defproc[(set-messages-locale
@@ -312,16 +344,16 @@ formatting options above.
 ;         #:row-properties '(bottom-border ())
          (list
           (list "" "pos-sep-by-space =" "0" "1" "2")
-          (list "pos-cs-precedes = 0" "pos-sign-posn = 0" @tt{(1.25$)}    @tt{(1.25 $)}   @tt{(1.25 $)})
-          (list ""                    "pos-sign-posn = 1" @tt{+1.25$}     @tt{+1.25 $}    @tt{+1.25 $})
-          (list ""                    "pos-sign-posn = 2" @tt{ 1.25$+}    @tt{ 1.25 $+}   @tt{ 1.25$ +})
-          (list ""                    "pos-sign-posn = 3" @tt{ 1.25+$}    @tt{ 1.25 +$}   @tt{ 1.25+ $})
-          (list ""                    "pos-sign-posn = 4" @tt{ 1.25$+}    @tt{ 1.25 $+}   @tt{ 1.25$ +})
-          (list "pos-cs-precedes = 1" "pos-sign-posn = 0" @tt{($1.25)}    @tt{($ 1.25)}   @tt{($ 1.25)})
-          (list ""                    "pos-sign-posn = 1" @tt{+$1.25}     @tt{+$ 1.25}    @tt{+ $1.25})
-          (list ""                    "pos-sign-posn = 2" @tt{ $1.25+}    @tt{ $ 1.25+}   @tt{  $1.25 +})
-          (list ""                    "pos-sign-posn = 3" @tt{+$1.25}     @tt{+$ 1.25}    @tt{+ $1.25})
-          (list ""                    "pos-sign-posn = 4" @tt{$+1.25}     @tt{$+ 1.25}    @tt{$ +1.25})
+          (list "pos-cs-precedes = 0" "pos-sign-posn = 0" @tt{(1.25$)} @tt{(1.25 $)} @tt{(1.25 $)})
+          (list ""                    "pos-sign-posn = 1" @tt{+1.25$}  @tt{+1.25 $}  @tt{+1.25 $})
+          (list ""                    "pos-sign-posn = 2" @tt{ 1.25$+} @tt{ 1.25 $+} @tt{ 1.25$ +})
+          (list ""                    "pos-sign-posn = 3" @tt{ 1.25+$} @tt{ 1.25 +$} @tt{ 1.25+ $})
+          (list ""                    "pos-sign-posn = 4" @tt{ 1.25$+} @tt{ 1.25 $+} @tt{ 1.25$ +})
+          (list "pos-cs-precedes = 1" "pos-sign-posn = 0" @tt{($1.25)} @tt{($ 1.25)} @tt{($ 1.25)})
+          (list ""                    "pos-sign-posn = 1" @tt{+$1.25}  @tt{+$ 1.25}  @tt{+ $1.25})
+          (list ""                    "pos-sign-posn = 2" @tt{ $1.25+} @tt{ $ 1.25+} @tt{  $1.25 +})
+          (list ""                    "pos-sign-posn = 3" @tt{+$1.25}  @tt{+$ 1.25}  @tt{+ $1.25})
+          (list ""                    "pos-sign-posn = 4" @tt{$+1.25}  @tt{$+ 1.25}  @tt{$ +1.25})
           )]
 }
 
