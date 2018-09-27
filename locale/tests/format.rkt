@@ -15,20 +15,6 @@
          locale/format
          locale/tests/utils)
 
-; we do this to debug builds, is it failing because of defects in test
-; cases or because certain, assumed, locales are not present on the
-; test system.
-(begin
-  (define known-locales (get-known-locales))
-  (displayln "Known locales:")
-  (displayln
-   (sort
-    (flatten
-     (for/list ([language (hash-keys known-locales)])
-       (for/list ([country (hash-keys (hash-ref known-locales language))])
-         (format "~a_~a" language country))))
-    string<?)))
-
 ;; ---------- Test Cases
 
 (test-case

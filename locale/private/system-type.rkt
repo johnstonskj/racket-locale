@@ -26,5 +26,8 @@
       ['windows type]
       ['macosx type]
       ['unix
-       (string->symbol (string-trim (with-output-to-string (lambda () (system "uname -s")))))]
+       (string->symbol
+        (string-downcase
+         (string-trim
+          (with-output-to-string (lambda () (system "uname -s"))))))]
       [else (error "unknown system type " type)])))

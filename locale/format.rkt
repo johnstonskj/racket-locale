@@ -247,7 +247,7 @@
                  format-str
                  (λ (var) (display (replace-datetime-var dt format-str var) out))
                  (λ (str) (display str out)))
-  (get-output-string out))
+  (string-trim (get-output-string out)))
 
 (define (replace-datetime-var dt format-str var)
   (match var
