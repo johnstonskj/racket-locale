@@ -40,7 +40,7 @@ install:
  - raco pkg install --deps search-auto
 
 before_script:
- - locale
+ - locale -a
  - env |grep LC_
  - (echo "import locale" ; echo "print locale.setlocale(locale.LC_TIME, \"en_GB\")") | python
 
