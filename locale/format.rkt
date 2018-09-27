@@ -50,18 +50,24 @@
 (define default-pad-char " ")
 
 (define (format-number num)
-  (define defaults (string-split (number->string num) default-decimal))
-  (if (= (length defaults) 2)
-      (format "~a~a~a" (format-thousands (first defaults)) (decimal-point) (second defaults))
-      (format-thousands (first defaults))))
+  (define numeric-locale (get-numeric-locale))
+  ;; TODO: fix the bug where this resets LC_NUMERIC to C
+  (define strings (string-split (number->string num) default-decimal))
+  (set-numeric-locale numeric-locale)
+  (if (= (length strings) 2)
+      (format "~a~a~a" (format-thousands (first strings)) (decimal-point) (second strings))
+      (format-thousands (first strings))))
 
 (define (format-currency num [international #f])
   ;; http://www.cplusplus.com/reference/clocale/lconv/
   (define locale-conv (get-locale-conventions))
+  (define numeric-locale (get-numeric-locale))
   (define defaults (string-split (number->string (abs num)) default-decimal))
+  ;; TODO: fix the bug where this resets LC_NUMERIC to C
   (define fractional (if international
                          (locale-international-fractional-digits locale-conv)
                          (locale-fractional-digits locale-conv)))
+  (set-numeric-locale numeric-locale)
   (define basic (if (= (length defaults) 2)
                     (format "~a~a~a" (format-thousands (first defaults) #t)
                             (decimal-point #t)
@@ -111,9 +117,10 @@
 ;; ---------- Internal procedures
 
 (define (format-thousands str [currency #f])
+  (define lc (get-locale-conventions))
   (define grouping (if currency
-                       (locale-monetary-grouping (get-locale-conventions))
-                       (locale-grouping (get-locale-conventions))))
+                       (locale-monetary-grouping lc)
+                       (locale-grouping lc)))
   (define group (vector-ref grouping 0))
   (cond
     [(and (> group grouping-repeats)

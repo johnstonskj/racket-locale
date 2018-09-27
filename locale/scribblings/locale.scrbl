@@ -17,45 +17,81 @@
 
 @;{============================================================================}
 
-@title{Module locale.}
+@title{Module locale}
 @defmodule[locale]
 
 More locale tools for Racket
 
 @examples[ #:eval example-eval
 (require locale)
-(set-locale "en_GB")
-(get-locale-conventions)
-(set-locale (make-locale-string "ja" "JP"))
-(get-locale-conventions)
-(set-locale "C")
-(get-locale-conventions)
-(get-known-locales)
+(set-user-preferred-locale)
+(get-locale)
+(set-numeric-locale "C")
+(get-locale)
+(set-locale
+ (make-locale-string "en" ; language
+                     "GB" ; country/territory
+                     #:code-page (normalize-code-page 'utf-8)))
 ]
 
 @;{============================================================================}
-
-Document  - TBD
+@section{Locale Strings}
 
 @defproc[(locale-string?
           [str string?])
          boolean?]{
-TBD
+Returns @racket[#t] if the provided string @racket[str] is a correctly formatted
+locale name according to the following rules:
+
+@verbatim|{
+locale    := "C"
+           | "POSIX"
+           | (language) ("_" territory)? ("." code-page)? ("@" modifier)
+
+language  := [a-z]{2,3}
+
+territory := [A-Z]{2,3}
+
+code-page := [a-zA-Z0-9\-]+
+
+modifier  := [a-zA-Z0-9\-]+
+}|
 }
 
 @defproc[(make-locale-string
           [language string?]
           [country string? ""]
           [#:code-page code-page string? ""]
-          [#:options options string? ""])
+          [#:options modifier string? ""])
          (or/c string? #f)]{
+Construct a locale string from the constituent components. Note that the same
+validation described for @racket[locale-string?] will be applied, any invalid
+value will result in @racket[#f] rather than a locale string.
+}
+
+@defproc[(normalize-code-page
+          [code-page (or/c 'utf-8 'ascii 'iso-8859-1 'iso-8859-15)])
+         string?]{
 TBD
 }
 
 @defproc[(get-known-locales)
          (hash/c string? (hash/c string? (listof string?)))]{
-TBD
+This function will enumerate the set of locales known by the operating system
+on the current machine. Naming conventions for code pages and modifiers vary
+considerably by operating system. The result is a @racket[hash?] where the top hash keys
+are the locale @racket[language], with the value being another hash. This second hash has
+the @racket[territory] as the key and a list of @racket[code-page] and
+@racket[modifier] strings as the hash value.
+
+@examples[ #:eval example-eval
+(require locale)
+(get-known-locales)
+]
 }
+
+@;{============================================================================}
+@section{Locale Accessors}
   
 @defproc[(set-minimal-locale)
          (or/c locale-string? #f)]{
@@ -144,16 +180,23 @@ TBD
 TBD
 }
 
+@;{============================================================================}
+@section{Locale Conventions}
+
 @defthing[grouping-repeats nonnegative-integer?]{
-TBD
+An integer, used in the @racket[locale?] @tt{grouping} and @tt{monetary-grouping}
+properties to denote that the group should repeat indefinitely.
 }
 
 @defthing[grouping-ends positive-integer?]{
-TBD
+An integer, used in the @racket[locale?] @tt{grouping} and @tt{monetary-grouping}
+properties to denote that no further grouping should be performed.
 }
 
 @defthing[unspecified-sign-posn positive-integer?]{
-TBD
+An integer, used in the @racket[locale?] @tt{pos-sign-posn}, @tt{neg-sign-posn},
+@tt{international-pos-sign-posn}, and @tt{international-neg-sign-posn}
+properties.
 }
 
 @defstruct*[locale
@@ -181,7 +224,8 @@ TBD
    [international-neg-sep-by-space integer?]
    [international-pos-sign-posn integer?]
    [international-neg-sign-posn integer?])]{
-TBD
+This struct provides information on formatting numeric and monetary (not date) values. The
+properties are described in detail below.
 
 @itemlist[
  @item{@racket[decimal-point] - Decimal-point separator used for non-monetary quantities.}
@@ -260,8 +304,8 @@ TBD
    international format.}
 ]
 
-For example, given the currency value @tt{1.25} this is the effect of the various formatting
-details above.
+For example, given the currency value @tt{1.25} the table below shows the effect of the various
+formatting options above.
 
 @tabular[#:style 'boxed
 ;         #:column-properties '(() (right-border) ())
@@ -283,5 +327,14 @@ details above.
 
 @defproc[(get-locale-conventions)
           locale?]{
-TBD
+Return a @racket[locale?] struct for the current locale settings.
+
+@examples[ #:eval example-eval
+(require locale)
+(set-locale
+ (make-locale-string "en" ; language
+                     "GB" ; country/territory
+                     #:code-page (normalize-code-page 'utf-8)))
+(get-locale-conventions)
+]
 }

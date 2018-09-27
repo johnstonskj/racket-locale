@@ -16,22 +16,20 @@
 
 @;{============================================================================}
 
-@title{Module locale/language-info.}
+@title{Module locale/language-info}
 @defmodule[locale/language-info]
 
 More locale/language-info tools for Racket
 
 @examples[ #:eval example-eval
 (require locale/language-info)
-; add more here.
+(get-codeset)
+(get-datetime-format)
+(get-weekday-name 1)
+(get-month-name 2)
+(get-era-description)
+(get-currency-symbol)
 ]
-
-@;{============================================================================}
-
-@;Add your API documentation here...
-
-
-Document  - TBD
 
 @defproc[(get-codeset)
          string?]{
@@ -39,6 +37,9 @@ Return a string with the name of the character encoding used
  in the selected locale, such as @tt{"UTF-8"}, @tt{"ISO-8859-1"}, or
  @tt{"ANSI_X3.4-1968"} (better known as US-ASCII).
 }
+
+@;{============================================================================}
+@section[#:tag "nl_datetime"]{Date and Time formatting}
 
 @defproc[(get-datetime-format)
          string?]{
@@ -119,6 +120,9 @@ Era date and time format string.
 Era time format string.
 }
 
+@;{============================================================================}
+@section[#:tag "nl_numeric"]{Numeric and Currency formatting}
+
 @defproc[(get-alt-digit-symbol)
          string?]{
 Alternative symbols for digits.
@@ -135,6 +139,17 @@ Return separator character for thousands (groups of three
               digits).
 }
 
+@defproc[(get-currency-symbol)
+         string?]{
+Return the currency symbol, preceded by @tt{"-"} if the symbol
+ should appear before the value, @tt{"+"} if the symbol should
+ appear after the value, or @tt{"."} if the symbol should replace
+ the radix character.
+}
+
+@;{============================================================================}
+@section{Other formatting}
+
 @defproc[(get-yes-expression)
          string?]{
 Return a regular expression that can be used with the @racket[regexp]
@@ -147,29 +162,4 @@ Return a regular expression that can be used with the @racket[regexp]
 Return a regular expression that can be used with the @racket[regexp]
  function to recognize a negative response to a yes/no
  question.
-}
-
-@defproc[(get-yes-response)
-         string?]{
-String corresponding to an affirmative response to a yes/no question (deprecated).
-}
-
-@defproc[(get-no-response)
-         string?]{
-String corresponding to a negative response to a yes/no question (deprecated).
-
-
-}
-
-@defproc[(get-currency-symbol)
-         string?]{
-Return the currency symbol, preceded by @tt{"-"} if the symbol
- should appear before the value, @tt{"+"} if the symbol should
- appear after the value, or @tt{"."} if the symbol should replace
- the radix character.
-}
-
-@defproc[(get-month-day-order)
-         string?]{
-month/day order (local extension)
 }

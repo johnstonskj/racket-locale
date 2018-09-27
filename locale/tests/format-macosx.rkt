@@ -14,8 +14,7 @@
          locale
          locale/format
          locale/language-info
-         locale/private/system-type
-         locale/tests/utils)
+         locale/private/system-type)
 
 (when (equal? system-type-ext 'macosx)
 
@@ -92,7 +91,7 @@
 
   (test-case
    "format-datetime: success/us"
-   (define us-locale (make-locale-string "en" "US" #:code-page (get-code-page 'utf-8)))
+   (define us-locale (make-locale-string "en" "US" #:code-page (normalize-code-page 'utf-8)))
    (check-equal? (set-time-locale us-locale) us-locale)
    (log-info (format "Using ~a date-time format: ~s" (get-locale) (get-datetime-format)))
    (check-equal? (format-datetime test-seconds) "Tue October 25 8:13:15 2018")
@@ -100,7 +99,7 @@
   
   (test-case
    "format-datetime: success/fr"
-   (define fr-locale (make-locale-string "fr" "FR" #:code-page (get-code-page 'utf-8)))
+   (define fr-locale (make-locale-string "fr" "FR" #:code-page (normalize-code-page 'utf-8)))
    (check-equal? (set-time-locale fr-locale) fr-locale)
    (log-info (format "Using ~a date-time format: ~s" (get-locale) (get-datetime-format)))
    (check-equal? (format-datetime test-seconds) "Mar 25 octobre 8:13:15 2018")
@@ -108,7 +107,7 @@
 
   (test-case
    "format-date: success/us"
-   (define us-locale (make-locale-string "en" "US" #:code-page (get-code-page 'utf-8)))
+   (define us-locale (make-locale-string "en" "US" #:code-page (normalize-code-page 'utf-8)))
    (check-equal? (set-time-locale us-locale) us-locale)
    (log-info (format "Using ~a date format: ~s"(get-locale)  (get-date-format)))
    (check-equal? (format-date test-seconds) "9/25/2018")
@@ -116,7 +115,7 @@
   
   (test-case
    "format-date: success/fr"
-   (define fr-locale (make-locale-string "fr" "FR" #:code-page (get-code-page 'utf-8)))
+   (define fr-locale (make-locale-string "fr" "FR" #:code-page (normalize-code-page 'utf-8)))
    (check-equal? (set-time-locale fr-locale) fr-locale)
    (log-info (format "Using ~a date format: ~s"(get-locale)  (get-date-format)))
    (check-equal? (format-date test-seconds) "25.9.2018")
@@ -124,7 +123,7 @@
 
   (test-case
    "format-time: success/us"
-   (define us-locale (make-locale-string "en" "US" #:code-page (get-code-page 'utf-8)))
+   (define us-locale (make-locale-string "en" "US" #:code-page (normalize-code-page 'utf-8)))
    (check-equal? (set-time-locale us-locale) us-locale)
    (log-info (format "Using ~a time format: ~s" (get-locale) (get-time-format)))
    (check-equal? (format-time test-seconds #f) "8:13:15")
@@ -132,7 +131,7 @@
   
   (test-case
    "format-time: success/us/am-pm"
-   (define us-locale (make-locale-string "en" "US" #:code-page (get-code-page 'utf-8)))
+   (define us-locale (make-locale-string "en" "US" #:code-page (normalize-code-page 'utf-8)))
    (check-equal? (set-time-locale us-locale) us-locale)
    (log-info (format "Using ~a am/pm time format: ~s" (get-locale) (get-time-ampm-format)))
    (check-equal? (format-time test-seconds #t) "8:13:15 AM")
@@ -140,7 +139,7 @@
   
   (test-case
    "format-time: success/fr"
-   (define fr-locale (make-locale-string "fr" "FR" #:code-page (get-code-page 'utf-8)))
+   (define fr-locale (make-locale-string "fr" "FR" #:code-page (normalize-code-page 'utf-8)))
    (check-equal? (set-time-locale fr-locale) fr-locale)
    (log-info (format "Using ~a time format: ~s" (get-locale) (get-time-format)))
    (check-equal? (format-time test-seconds #f) "8:13:15")
@@ -148,7 +147,7 @@
 
   (test-case
    "format-time: success/fr/am-pm"
-   (define fr-locale (make-locale-string "fr" "FR" #:code-page (get-code-page 'utf-8)))
+   (define fr-locale (make-locale-string "fr" "FR" #:code-page (normalize-code-page 'utf-8)))
    (check-equal? (set-time-locale fr-locale) fr-locale)
    (log-info (format "Using ~a am/pm time format: ~s" (get-locale) (get-time-ampm-format)))
    (check-equal? (format-time test-seconds #t) "8:13:15 AM")

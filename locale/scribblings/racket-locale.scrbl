@@ -4,10 +4,13 @@
 
 @;{============================================================================}
 
-@title[#:version "1.0"]{Package locale.}
+@title[#:version "1.0"]{Package racket-locale}
 @author[(author+email "Simon Johnston" "johnstonskj@gmail.com")]
 
-More locale tools for Racket
+This package provides access to operating system locale configuration, and
+specifically the C runtime @tt{setlocale} and @tt{localeconv} functions. It
+also implements higher-level formatting functions for dates, numbers, and
+currency values.
 
 @table-of-contents[]
 

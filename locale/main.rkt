@@ -18,6 +18,9 @@
   [make-locale-string
    (->* (string?) (string? #:code-page string? #:options string?) (or/c string? #f))]
 
+  [normalize-code-page
+   (-> (or/c 'utf-8 'ascii 'iso-8859-1 'iso-8859-15) string?)]
+  
   [get-known-locales
    (-> (hash/c string? (hash/c string? (listof string?))))]
   
@@ -91,7 +94,8 @@
          racket/string
          racket/system
          racket/vector
-         locale/private/clocale)
+         locale/private/clocale
+         locale/private/system-type)
 
 ;; ---------- Internal
 
@@ -138,6 +142,30 @@
                 international-neg-sign-posn)
   #:transparent)
 
+(define (normalize-code-page cp)
+  (cond
+    [(equal? cp "") ""]
+    [(equal? cp 'utf-8)
+     (match system-type-ext
+       ['macosx "UTF-8"]
+       ['linux "utf8"]
+       [else "utf-8"])]
+    [(equal? cp 'ascii)
+     (match system-type-ext
+       ['macosx "US-ASCII"]
+       ['linux ""]
+       [else "ASCII"])]
+    [equal? cp 'iso-8859-1
+     (match system-type-ext
+       ['macosx "ISO8859-1"]
+       ['linux "iso88591"]
+       [else ""])]
+    [equal? cp 'iso-8859-15
+     (match system-type-ext
+       ['macosx "ISO8859-15"]
+       ['linux "iso885915"]
+       [else ""])]))
+
 (define (make-locale-string language [country ""] #:code-page [code-page ""] #:options [options ""])
   (cond
     [(false? (regexp-match #px"^[a-z]{2,3}$" language))
@@ -165,8 +193,10 @@
                       options))]))
 
 (define (locale-string? str)
-  (define matches (regexp-match locale-name-string str))
-  (list? matches))
+  (if (or (equal? str MINIMAL_LOCALE) (equal? str USER_LOCALE))
+      #t
+      (let ([matches (regexp-match locale-name-string str)])
+        (list? matches))))
 
 (define (set-minimal-locale)
   (setlocale LC_ALL MINIMAL_LOCALE))
@@ -178,7 +208,21 @@
   (setlocale LC_ALL locale-string))
 
 (define (get-locale)
-  (setlocale LC_ALL #f))
+  ;; we will use the Linux convention where LC_ALL will return a simple string if all
+  ;; categories share the same locale, else we return a set of category=locale pairs.
+  (define all-locales (setlocale LC_ALL #f))
+  (match system-type-ext
+    ['macosx
+     (define split-locales (string-split all-locales "/"))
+     (cond
+       [(> (length split-locales) 1)
+        (string-join
+         (for/list ([locale split-locales]
+                    [name '("COLLATE" "CTYPE" "MONETARY" "NUMERIC" "TIME" "MESSAGES")])
+           (format "~a=~a" name locale))
+         ";")]
+       [else all-locales])]
+    [else all-locales]))
 
 (define (set-collation-locale locale-string)
   (setlocale LC_COLLATE locale-string))

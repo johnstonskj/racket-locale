@@ -13,8 +13,8 @@
 ## Modules
 
 * `locale` - basic locale functions, get/set the current locale as well as locale conventions.
-* `locale/language-info` - additional locale information.
-* `locale/format` - locale -aware formatting for numbers, currency, and dates,
+* `locale/language-info` - additional locale information including formatting strings.
+* `locale/format` - locale-aware formatting for numbers, currency, and dates,
 
 ## Example
 

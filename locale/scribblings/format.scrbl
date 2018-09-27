@@ -17,7 +17,7 @@
                                 locale/format)))
 
 @;{============================================================================}
-@title{Module locale/format.}
+@title{Module locale/format}
 @defmodule[locale/format]
 
 
@@ -26,24 +26,31 @@
 (require locale
          locale/format
          racket/date)
-(set-locale "en_GB")
-
+(set-locale "en_US")
+(format-date (current-date))
+(format-number 1234567.89)
+(format-currency 10.99)
+(set-locale "fr_FR")
 (format-date (current-date))
 (format-number 1234567.89)
 (format-currency 10.99)
 ]
 
 @;{============================================================================}
-
-@;Add your API documentation here...
-
-
-Document  - TBD
+@section{Numbers and Currency}
 
 @defproc[(format-number
           [value number?])
          string?]{
 TBD
+@examples[ #:eval example-eval
+(require locale
+         locale/format
+         racket/date)
+(set-locale "en_US")
+(get-locale-conventions)
+(format-number 1234567.89)
+]
 }
 
 @defproc[(format-currency
@@ -52,6 +59,9 @@ TBD
 TBD
 }
  
+@;{============================================================================}
+@section{Dates and Times}
+
 @defproc[(format-date
          [value (or/c date? number?)])
          string?]{

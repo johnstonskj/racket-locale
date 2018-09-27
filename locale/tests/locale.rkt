@@ -9,8 +9,7 @@
 
 (require rackunit
          ; ---------
-         locale
-         locale/tests/utils)
+         locale)
 
 ;; ---------- Test Fixtures
 
@@ -20,7 +19,7 @@
 
 (test-case
  "get-locale-conventions: check conventions for known locale"
- (define locale (make-locale-string "en" "GB" #:code-page (get-code-page 'utf-8)))
+ (define locale (make-locale-string "en" "GB" #:code-page (normalize-code-page 'utf-8)))
  (check-equal? (set-numeric-locale locale) locale)
  (define conventions (get-locale-conventions))
  (check-equal? (locale-decimal-point conventions) ".")
