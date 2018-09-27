@@ -17,8 +17,6 @@ More locale tools for Racket
 
 @include-section["format.scrbl"]
 
-@include-section["names.scrbl"]
-
 @section{License}
 
 @verbatim|{|@file->string["../LICENSE"]}|
